@@ -21,6 +21,8 @@ def group_parameters(m):
 # endregion
 
 # region SAE
+# This code is followed from:
+# https://github.com/Abhipanda4/Sparse-Autoencoders
 def kl_divergence(p, q):
     '''
     args:
@@ -39,7 +41,7 @@ def kl_divergence(p, q):
 
 # region CAE
 '''
-This code reference from:
+This code is followed from:
 https://github.com/AlexPasqua/Autoencoders/blob/main/src/custom_losses.py
 '''
 class ContractiveLoss(loss.MSELoss):
