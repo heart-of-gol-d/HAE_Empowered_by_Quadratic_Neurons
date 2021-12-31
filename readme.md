@@ -1,5 +1,5 @@
 # Heterogeneous Autoencoder Empowered by Quadratic Neurons
-This is an official repository of the paper "Heterogeneous Autoencoder Empowered by Quadratic Neurons".  In this work,
+This is the repository of our submission for IJCAI 2022 "Heterogeneous Autoencoder Empowered by Quadratic Neurons" In this work,
 
 1. We prototype a generic  fully-connected quadratic autoencoder;
 2. We design a random ensemble mixed autoencoder;
