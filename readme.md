@@ -77,7 +77,7 @@ HAE_Empowered_by_Quadratic_Neurons
 ## Quadratic Autoencoder
 Run  ```quadratic_autoencoder/train.py``` to train a quadratic autoencoder or a conventional autoencoder. 
 
-We has uploaded *MNIST* , *Fashion-MNIST* and *Olivetti Faces* in ***'quadratic_autoencoder/data'*** . For *YaleB*, you need to visit [YaleB](http://vision.ucsd.edu/~leekc/ExtYaleDatabase/ExtYaleB.html) to download **Cropped Images**  and unzip to the ***'quadratic_autoencoder/data'***  folder. This program will save the models and results of your training at ***'quadratic_autoencoder/model'*** and ***'quadratic_autoencoder/results'*** , respectively.
+*MNIST* , *Fashion-MNIST* and *Olivetti Faces* will be automatically downloaded in ***'quadratic_autoencoder/data'*** when you run ***'train.py'*** for the first time. For *YaleB*, you need to visit [YaleB](http://vision.ucsd.edu/~leekc/ExtYaleDatabase/ExtYaleB.html) to download **Cropped Images**  and unzip to the ***'quadratic_autoencoder/data'***  folder. This program will save the models and results of your training at ***'quadratic_autoencoder/model'*** and ***'quadratic_autoencoder/results'*** , respectively.
 ## Ensemble Autoencoder
 Run ```ensemble_autoencoder/train.py``` to train a random ensemble autoencoder. Set **swap_rate > 0** to train an ensemble mixed autoencoder (EMAE). 
 
