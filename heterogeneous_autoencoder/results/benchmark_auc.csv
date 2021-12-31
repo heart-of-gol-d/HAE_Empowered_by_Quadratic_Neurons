@@ -1,0 +1,2 @@
+Data,#Samples,# Dimensions,Outlier Perc,LOF,OCSVM,SUOD,SO-GAAL,DeepSVD
+arrhythmia,452,274,14.6018,0.7787,0.7986,0.7962,0.4692,0.7383
