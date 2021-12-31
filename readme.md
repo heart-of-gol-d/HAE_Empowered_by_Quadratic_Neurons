@@ -109,5 +109,3 @@ We follow the implementation of some anomaly detection algorithm by [pyod](https
 [5] Zhao, Y., Nasrullah, Z. and Li, Z., 2019. PyOD: A Python Toolbox for Scalable Outlier Detection. Journal of machine learning research (JMLR), 20(96), pp.1-7.
 
 [6] https://github.com/avijit9/Contractive_Autoencoder_in_Pytorch
-
-[7] https://github.com/FengleiFan/ReLinear
