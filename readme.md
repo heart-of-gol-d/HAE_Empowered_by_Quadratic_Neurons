@@ -9,22 +9,22 @@ All experiments are conducted with Windows 10 on an AMD R5 3600 CPU at 3.60 GHz 
 
 ## Quadratic Autoencoder
 A quadratic autoencoder is constructed by quadratic neurons. We prototype a fully-conneted quadratic autoencoder.
-![An  overview  of  fully-connected  quadratic  autoencoder.The core is the employment of quadratic neurons](https://raw.githubusercontent.com/ljxstc/image_repository/master/小书匠/1640488416607.png)
+![An  overview  of  fully-connected  quadratic  autoencoder.The core is the employment of quadratic neurons](https://raw.githubusercontent.com/asdvfghg/image/master/小书匠/1641001696436.png)
 ### Quadratic Neurons
 A quadratic neuron was proposed by [1], It computes two inner products  and  one  power  term  of  the  input  vector  and  integrates them for a nonlinear activation function. The output function of a quadratic neuron is expressed as 
 
-![enter description here](https://raw.githubusercontent.com/ljxstc/image_repository/master/小书匠/1640488416614.png),
+![enter description here](https://raw.githubusercontent.com/asdvfghg/image/master/小书匠/1641001696385.png),
 
 where $\sigma(\cdot)$ is a nonlinear activation function, $\odot$ denotes the Hadamard product, $\boldsymbol{w}^r,\boldsymbol{w}^g, \boldsymbol{w}^b\in\mathbb{R}^n$ are weight vectors, and $b^r, b^g, c\in\mathbb{R}$ are biases. When $\boldsymbol{w}^g=0$, $b^g=1$, and $\boldsymbol{w}^b=0$, a quadratic neuron degenerates to a conventional neuron:  $\sigma(f(\boldsymbol{x}))= \sigma(\boldsymbol{x}^\top\boldsymbol{w}^{r}+b^{r})$. 
 ## Random Ensemble Autoencoder
 To get two ensemble mixed autoencoders (EMAE), we randomly swap the scores of quadratic autoencoders and conventional autoencoders by a rate $\beta$=0.2, 0.5, 0.8 and get two final scores.
 
-![A scheme of random ensemble mixed autoencoder.](https://raw.githubusercontent.com/ljxstc/image_repository/master/小书匠/1640274878158.png)
+![A scheme of random ensemble mixed autoencoder.](https://raw.githubusercontent.com/asdvfghg/image/master/小书匠/1641001696437.png)
 
 
 ## Heterogeneous Autoencoder
 We propose three heterogeneous autoencoders integrating conventional  and  quadratic  neurons  in  one  model,  referred  to  as HAE-X, HAE-Y, and HAE-I, respectively.
-![The scheme of HAE-X, HAE-Y, and HAE-I.](https://raw.githubusercontent.com/ljxstc/image_repository/master/小书匠/1640274878159.png)
+![The scheme of HAE-X, HAE-Y, and HAE-I.](https://raw.githubusercontent.com/asdvfghg/image/master/小书匠/1641001696444.png)
 
 # Repository organization
 This repository is organized by three folders, which correspond to the three main experiments in our paper. Three programs (quadratic_autoencoder, ensemble_autoencoder, and heterogeneous_autoencoder) can be run independently.
