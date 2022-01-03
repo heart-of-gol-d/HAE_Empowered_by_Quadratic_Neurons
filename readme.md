@@ -46,6 +46,7 @@ HAE_Empowered_by_Quadratic_Neurons
 │   │   └─── AEModel # Base Model Structure
 │   │	│  │	AE.py
 │   │	│  │	QAE.py
+│   │	│  │	MLP.py
 │   │   └─── utils
 │   │	│  │	Dataloader.py
 │   │	│  │	QuadraticOperation.py
@@ -98,7 +99,7 @@ We follow the implementation of some anomaly detection algorithm by [pyod](https
 
 
 # Reference
-[1] Fenglei Fan, Wenxiang Cong, and Ge Wang.   A new type of neu-rons for machine learning.International journal for numericalmethods in biomedical engineering, 34(2):e2920, 2018.
+[1] Fenglei Fan, Wenxiang Cong, and Ge Wang.   A new type of neurons for machine learning.International journal for numericalmethods in biomedical engineering, 34(2):e2920, 2018.
 
 [2] Chen, J., Sathe, S., Aggarwal, C., & Turaga, D. (2017, June). Outlier detection with autoencoder ensembles. In Proceedings of the 2017 SIAM international conference on data mining (pp. 90-98). Society for Industrial and Applied Mathematics.
 
