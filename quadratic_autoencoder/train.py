@@ -17,6 +17,7 @@ from torch.nn import functional as F
 import matplotlib.pyplot as plt
 import pickle
 import pandas as pd
+from AEModel.MLP import MLP
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 use_gpu = torch.cuda.is_available()
@@ -159,7 +160,6 @@ def inference(dataloader, model_name, dataset_name, p=1e-3):
         return reconstruct, avg_loss
 
 
-
 def random_seed(seed: int):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
@@ -194,15 +194,74 @@ def autoencoder(mod_name, dataset_name, dataloader, p, reduce_dimension):
     y = y.ravel()
     return X, y
 
+def MLP_classifier(reduce_dimension: int, trainloader, testloader, epoch, lr, chosen_dataset):
+    if chosen_dataset in ('MNIST', 'FMNIST'):
+        net = MLP(reduce_dimension, 10)
+    if chosen_dataset == 'olivetti':
+        net = MLP(reduce_dimension, 40)
+    if chosen_dataset == 'YALEB':
+        net = MLP(reduce_dimension, 39)
+    loss_func = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(net.parameters(), lr=lr)
+    StepLR = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+    if use_gpu:
+        net.cuda()
+    train_loss_list = []
+    for e in range(epoch):
+        correct = 0
+        train_loss = 0
+        for step, (x, y) in enumerate(trainloader):
+            if use_gpu:
+                x, y = x.cuda(), y.cuda()
+            b_x = x.view(-1, reduce_dimension)
+
+            y_hat = net(b_x)
+            loss = loss_func(y_hat, y)
+            train_loss += loss.item()
+            y_pred = y_hat.max(1, keepdim=True)[1]
+            correct += y_pred.eq(y.view_as(y_pred)).sum().item()
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            if step % 20 == 0:
+                print('Epoch: [%d/%d] Step [%d/%d], Loss: %.4f ' % (e, epoch, step+1, len(trainloader), loss.item()))
+        train_loss_list.append(train_loss/len(trainloader.dataset))
+        StepLR.step()
+        train_acc = correct / len(trainloader.dataset)
+    # plt.figure()
+    # plt.plot(np.arange(epoch), train_loss_list)
+    # plt.savefig('figure\\softmax_loss', bbox_inches='tight', dpi=1200, pad_inches=0.05)
+
+    net.eval()
+    test_loss = 0
+    correct = 0
+    with torch.no_grad():
+        for data, target in testloader:
+            data, target = data.to(device), target.to(device)
+
+            output = net(data)
+
+            test_loss += F.cross_entropy(output, target).item()
+
+            # Get the index of the max log-probability
+            pred = output.max(1, keepdim=True)[1]
+            correct += pred.eq(target.view_as(pred)).sum().item()
+        test_acc = correct / len(testloader.dataset)
+
+
+    return train_acc, test_acc
 
 if __name__ == '__main__':
     # Available options
     dataset_name = ['YALEB', 'MNIST', 'FMNIST', 'olivetti']
     model_name = ['QAE', 'AE', 'QCAE', 'CAE', 'QSAE', 'SAE']
+    classifier = ['SOFTMAX', 'MLP']
     # init parameters
     chosen_dataset = dataset_name[1]  # 0-yaleb,1-MNIST,2-FMNIST,3-olivetti
     chosen_model = model_name[3]  # 0-QAE,1-AE,2-QCAE,3-CAE,4-QSAE,5-SAE
-    epoch = 10
+    chosen_classifier = classifier[1]  # 0-SOFTMAX,  1-MLP We use SOFTMAX on YALEB and Olivetti, MLP on MNIST and FMNIST, respectively.
+    epoch = 100
     lr = 0.001
     bs = 128
     slr = 0.1  # In AE models, sub_learning_rate is not used, but we recommend to set 0.1 for a mark.
@@ -221,11 +280,13 @@ if __name__ == '__main__':
     train_dataset.extend(vaild_dataset)
     data_loaders = DataLoader(train_dataset, batch_size=bs)
     if chosen_model in ('QAE', 'CAE', 'AE', 'QCAE'):
-        model_name_path = chosen_model + '_4_nonoise_' + str(reduced_dimension) + '_' + chosen_dataset + '_lr%f_bs_%d_slr_%f_lambd_%f_seed_%d' % (
+        model_name_path = chosen_model + '_4_nonoise_' + str(
+            reduced_dimension) + '_' + chosen_dataset + '_lr%f_bs_%d_slr_%f_lambd_%f_seed_%d' % (
                               lr, bs, slr, p, seed)
         print(model_name_path)
     else:
-        model_name_path = chosen_model + '_4_nonoise_' + str(reduced_dimension) + '_' + chosen_dataset + '_lr%f_bs_%d_slr_%f_beta_%f_seed_%d' % (
+        model_name_path = chosen_model + '_4_nonoise_' + str(
+            reduced_dimension) + '_' + chosen_dataset + '_lr%f_bs_%d_slr_%f_beta_%f_seed_%d' % (
                               lr, bs, slr, p, seed)
         print(model_name_path)
 
@@ -240,20 +301,39 @@ if __name__ == '__main__':
 
     # region Unsupervised dimension reduction and classification
     # Dimension reduction
-    X_new, y = autoencoder(model_name_path, chosen_dataset, data_loaders, p, reduced_dimension)
-    min_max_scaler = preprocessing.MinMaxScaler()
-    X_new = min_max_scaler.fit_transform(X_new)
+    if chosen_classifier == 'SOFTMAX':
+        X_new, y = autoencoder(model_name_path, chosen_dataset, data_loaders, p, reduced_dimension)
+        min_max_scaler = preprocessing.MinMaxScaler()
+        X_new = min_max_scaler.fit_transform(X_new)
 
-    # Classifier training
-    from sklearn.linear_model import LogisticRegression
-    model = LogisticRegression(penalty='l2', C=0.1, max_iter=500, solver='sag')
-    model.fit(X_new, y)
+        # Classifier training
+        from sklearn.linear_model import LogisticRegression
 
-    # test
-    X_test, y_test = autoencoder(model_name_path, chosen_dataset, test_loader, p, reduced_dimension)
-    X_test = min_max_scaler.fit_transform(X_test)
-    y_pred = model.predict(X_test)
-    test_acc_list.append(accuracy_score(y_pred, y_test))
+        model = LogisticRegression(penalty='l2', C=0.1, max_iter=500, solver='sag')
+        model.fit(X_new, y)
+
+        # test
+        X_test, y_test = autoencoder(model_name_path, chosen_dataset, test_loader, p, reduced_dimension)
+        X_test = min_max_scaler.fit_transform(X_test)
+        y_pred = model.predict(X_test)
+        test_acc_list.append(accuracy_score(y_pred, y_test))
+
+    if chosen_classifier == 'MLP':
+        X_new, y = autoencoder(model_name_path, chosen_dataset, data_loaders, p, reduced_dimension)
+        dataset = TensorDataset(torch.tensor(X_new, dtype=torch.float), torch.tensor(y, dtype=torch.long))
+
+        # # test
+        X_test, y_test = autoencoder(model_name_path, chosen_dataset, test_loader, p, reduced_dimension)
+
+        # training a MLP classifier
+        mlplr = 0.0001  #  you need to fine_tuning the hyperparameter in classification model
+        epoch = 200
+        traindataset = TensorDataset(torch.tensor(X_new, dtype=torch.float), torch.tensor(y, dtype=torch.long))
+        traindataloader = DataLoader(traindataset, batch_size=bs, shuffle=True)
+        testdataset = TensorDataset(torch.tensor(X_test, dtype=torch.float), torch.tensor(y_test, dtype=torch.long))
+        testdataloader = DataLoader(testdataset, batch_size=bs, shuffle=True)
+        train_acc, test_acc = MLP_classifier(reduced_dimension, traindataloader, testdataloader, epoch, mlplr, chosen_dataset)
+        test_acc_list.append(test_acc)
     # endregion
 
     # save results
